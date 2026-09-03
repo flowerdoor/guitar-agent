@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.venv/
+build/
+dist/
+*.spec.bak
+config.local.json
+data/*.db
+data/*.db-*
+

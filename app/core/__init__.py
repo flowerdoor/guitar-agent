@@ -1,0 +1,2 @@
+"""Framework-independent coaching logic."""
+
