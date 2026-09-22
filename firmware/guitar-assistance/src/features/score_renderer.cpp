@@ -1,4 +1,6 @@
 #include "features/score_renderer.h"
+#include "features/player_ui.h"
+#include "features/navigation_ui.h"
 
 #include <Arduino.h>
 #include <Adafruit_ILI9341.h>
@@ -36,7 +38,8 @@ ScoreRenderer::ScoreRenderer(DisplayDriver &display)
 void ScoreRenderer::render(
     const ScoreModel::TabStep *steps,
     size_t stepCount,
-    uint32_t currentTick
+    uint32_t currentTick,
+    bool playing
 ){
     if (steps == nullptr || stepCount == 0) {
         display_.clear(ILI9341_BLACK);
@@ -47,28 +50,25 @@ void ScoreRenderer::render(
             ILI9341_RED,
             2
         );
+        display_.present();
         return;
     }
     display_.clear(ILI9341_BLACK);
 
-    drawHeader();
     drawBeatGrid(steps,stepCount,currentTick);
     drawPlayhead();
     drawStrings();
     drawNotes(steps,stepCount,currentTick);
+
+    PlayerUi::drawControls(display_, playing);
+    NavigationUi::drawTopBar(display_);
+    display_.present();
 }
 //绘制标题
 void ScoreRenderer::drawHeader() {
-    display_.fillRect(
-        0,
-        0,
-        SCREEN_WIDTH,
-        32,
-        ILI9341_DARKCYAN
-    );
 
     display_.drawText(
-        8,
+        30,
         8,
         "Guitar Assistance",
         ILI9341_WHITE,
@@ -97,7 +97,7 @@ void ScoreRenderer::drawStrings(){
     }
 }
 //映射在x轴上对应时刻的位置
-int16_t ScoreRenderer::tickToX(
+int32_t ScoreRenderer::tickToX(
     uint32_t tick,
     uint32_t currentTick
 ) const {//tickx坐标可能是反的，后面检查一下

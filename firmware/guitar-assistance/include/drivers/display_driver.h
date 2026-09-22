@@ -40,6 +40,24 @@ public:
         int16_t height,
         uint16_t color
     );
-    private:
+
+    void fillTriangle(
+        int16_t x0, int16_t y0,
+        int16_t x1, int16_t y1,
+        int16_t x2, int16_t y2,
+        uint16_t color
+    );
+
+    void drawCircle(
+        int16_t x,
+        int16_t y,
+        int16_t radius,
+        uint16_t color
+    );
+
+    void present();
+private:
     Adafruit_ILI9341 lcd_;
+
+    GFXcanvas16 frame_;
 };

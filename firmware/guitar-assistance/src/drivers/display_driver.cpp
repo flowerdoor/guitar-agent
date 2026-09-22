@@ -10,7 +10,10 @@ DisplayDriver::DisplayDriver()
         BoardPins::LCD_CS, 
         BoardPins::LCD_DC, 
         BoardPins::LCD_RST
-    ) {
+    ) ,frame_(
+      BoardPins::SCREEN_WIDTH,
+      BoardPins::SCREEN_HEIGHT
+    ){
 }
 
 // 初始化显示屏
@@ -30,14 +33,22 @@ void DisplayDriver::begin() {
 
     lcd_.setRotation(1); // 横屏显示，分辨率为 320 x 240
 
-    lcd_.fillScreen(ILI9341_BLACK); // 清屏
-    digitalWrite(BoardPins::LCD_BL, HIGH);
+    if(frame_.getBuffer() == nullptr){
+        Serial.println("ERROR: Failed to allocate frame buffer");
+        while(1){
+          delay(1000);
+        }
+    }
 
+    frame_.fillScreen(ILI9341_BLACK); // 清屏
+    present();
+
+    digitalWrite(BoardPins::LCD_BL, HIGH);
 }
 
 // 清屏
 void DisplayDriver::clear(uint16_t color) {
-    lcd_.fillScreen(color);
+    frame_.fillScreen(color);
 }
 
 void DisplayDriver::drawText(
@@ -47,11 +58,11 @@ void DisplayDriver::drawText(
   uint16_t color,
   uint8_t size
 ) {
-  lcd_.setCursor(x, y);
-  lcd_.setTextSize(size);
-  lcd_.setTextColor(color,ILI9341_BLACK);
-  lcd_.setTextWrap(false);
-  lcd_.print(text);
+  frame_.setCursor(x, y);
+  frame_.setTextSize(size);
+  frame_.setTextColor(color,ILI9341_BLACK);
+  frame_.setTextWrap(false);
+  frame_.print(text);
 }
 
 void DisplayDriver::drawHLine(
@@ -64,7 +75,7 @@ void DisplayDriver::drawHLine(
   if (width <= 0 || thickness <= 0) {
     return;
   }
-  lcd_.fillRect(
+  frame_.fillRect(
     x,
     y - thickness /2,
     width,
@@ -79,7 +90,7 @@ void DisplayDriver::drawVLine(
   int16_t height,
   uint16_t color
 ) {
-  lcd_.drawFastVLine(
+  frame_.drawFastVLine(
     x,
     y,
     height,
@@ -94,11 +105,39 @@ void DisplayDriver::fillRect(
   int16_t height,
   uint16_t color
 ) {
-  lcd_.fillRect(
+  frame_.fillRect(
     x,
     y,
     width,
     height,
     color
+  );
+}
+
+void DisplayDriver::fillTriangle(
+    int16_t x0, int16_t y0,
+    int16_t x1, int16_t y1,
+    int16_t x2, int16_t y2,
+    uint16_t color
+) {
+    frame_.fillTriangle(x0, y0, x1, y1, x2, y2, color);
+}
+
+void DisplayDriver::drawCircle(
+  int16_t x,
+  int16_t y,
+  int16_t radius,
+  uint16_t color
+){
+  frame_.drawCircle(x,y,radius,color);
+}
+
+void DisplayDriver::present(){
+  lcd_.drawRGBBitmap(
+    0,
+    0,
+    frame_.getBuffer(),
+    BoardPins::SCREEN_WIDTH,
+    BoardPins::SCREEN_HEIGHT
   );
 }

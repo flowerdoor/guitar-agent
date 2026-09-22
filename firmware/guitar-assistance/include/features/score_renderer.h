@@ -18,7 +18,8 @@ public:
     void render(
         const ScoreModel::TabStep *steps,
         size_t stepCount,
-        uint32_t currentTick
+        uint32_t currentTick,
+        bool playing
     );
     // 将屏幕横坐标转换为 Tick
     int32_t pixelsToTicks(int16_t pixels) const;
@@ -50,7 +51,7 @@ private:
         int8_t fret
     );
     // 将 Tick 转换为屏幕横坐标
-    int16_t tickToX(
+    int32_t tickToX(
         uint32_t tick,
         uint32_t currentTick
     ) const;

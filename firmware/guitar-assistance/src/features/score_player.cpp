@@ -96,9 +96,7 @@ void ScorePlayer::seek(uint32_t tick){
     anchorTick_ = tick;
     anchorTimeMs_ = millis();
     // 到达末尾后停止播放
-    if (tick >= totalTicks_) {
-        playing_ = false;
-    }
+    playing_ = false;
 }
 
 //上一拍
@@ -153,4 +151,8 @@ uint32_t ScorePlayer::clampTick(uint32_t tick)const{
     }
 
     return tick;
+}
+// 获取乐谱总 Tick 数
+uint32_t ScorePlayer::totalTicks() const {
+    return totalTicks_;
 }
